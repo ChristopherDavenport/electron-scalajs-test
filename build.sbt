@@ -7,7 +7,6 @@ ThisBuild / scalaVersion := Scala213
 
 ThisBuild / testFrameworks += new TestFramework("munit.Framework")
 
-
 val catsV = "2.6.1"
 val catsEffectV = "3.1.1"
 val fs2V = "3.1.1"
@@ -36,7 +35,7 @@ lazy val node = project
     Compile / npmDependencies += "@types/node" -> "16.0.0",
     Compile / npmDependencies += "electron" -> "13.2.2",
 
-    // useYarn := true,
+    useYarn := true,
     // yarnExtraArgs += "--frozen-lockfile",
     stOutputPackage := "io.chrisdavenport.electrontest.internal.jsdeps",
     stStdlib := List("es2020")
@@ -44,10 +43,10 @@ lazy val node = project
 
 lazy val core = project.in(file("core"))
   .enablePlugins(ScalaJSPlugin)
+  .enablePlugins(ScalaJSBundlerPlugin)
   .dependsOn(node)
   .settings(commonSettings)
   .settings(
-    stOutputPackage := "io.chrisdavenport.electrontest.types",
     name := "electron-test",
     scalaJSUseMainModuleInitializer := true,
     scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.CommonJSModule)),

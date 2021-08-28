@@ -55,8 +55,7 @@ final class ElectronJSEnv(config: ElectronJSEnv.Config) extends JSEnv {
 
   private def internalStart(input: Seq[Input], runConfig: RunConfig): JSRun = {
     val command = config.executable :: 
-      "/home/chris/Documents/scalajs/electron-test/core/target/scala-2.13/scalajs-bundler/main" :: 
-      "--run-as-node" ::
+      "./core/target/scala-2.13/scalajs-bundler/main" :: 
       config.args
     val externalConfig = ExternalJSRun.Config()
       .withEnv(env)

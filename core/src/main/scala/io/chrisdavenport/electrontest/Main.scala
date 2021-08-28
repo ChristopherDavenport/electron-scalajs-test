@@ -5,19 +5,29 @@ import cats.effect._
 import io.chrisdavenport.electrontest.internal.jsdeps.electron.mod.{BrowserWindow, NodeEventEmitter}
 
 import io.chrisdavenport.electrontest.internal.jsdeps.electron.electronRequire
-import io.chrisdavenport.electrontest.internal.jsdeps.electron.global.Electron.app
+import io.chrisdavenport.electrontest.internal.jsdeps.electron.mod.app
+import io.chrisdavenport.electrontest.internal.jsdeps.electron
+
+import electron.mod.BrowserWindow
+
 // import fs2.internal.jsdeps.node.eventsMod
-import cats.effect.unsafe.IORuntime.global
+// import cats.effect.unsafe.IORuntime.global
 
-
-object App extends NodeEventEmitter
 
 object Main  {
 
+  def createWindow() = {
+    val window = new BrowserWindow(
+      electron.Electron.BrowserWindowConstructorOptions()
+        .setMaxHeight(600)
+        .setMaxWidth(800)
+    )
+    // window.loadFile("index.html")
+  }
+
   def main(args: Array[String]): Unit = {
-    electronRequire
-    app.on("ready", {_: Any => println("Hey There")})
-    
+    app.on("ready", {_: Any => createWindow(); ()})
+    app.on("window-all-closed", {_: Any => app.quit()})
   }
 
   // def run(args: List[String]): IO[ExitCode] = {

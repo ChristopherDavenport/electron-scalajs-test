@@ -1,3 +1,7 @@
+import scala.concurrent.Future
+import org.scalajs.jsenv.{Input, JSRun, RunConfig}
+import org.scalajs.jsenv.{Input, JSComRun, RunConfig}
+import org.scalajs.jsenv.JSEnv
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
 val Scala213 = "2.13.6"
@@ -32,8 +36,8 @@ lazy val node = project
     scalacOptions += "-nowarn",
     Compile / doc / sources := Nil,
     scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.CommonJSModule)),
-    Compile / npmDependencies += "@types/node" -> "16.0.0",
-    Compile / npmDependencies += "electron" -> "13.2.2",
+    Compile / npmDependencies += "@types/node" -> "14.17.5",
+    Compile / npmDependencies += "electron" -> "13.2.3",
 
     useYarn := true,
     // yarnExtraArgs += "--frozen-lockfile",
@@ -41,6 +45,8 @@ lazy val node = project
     stStdlib := List("es2020")
   )
 
+
+import org.scalajs.jsenv._
 lazy val core = project.in(file("core"))
   .enablePlugins(ScalaJSPlugin)
   .enablePlugins(ScalaJSBundlerPlugin)
@@ -50,6 +56,7 @@ lazy val core = project.in(file("core"))
     name := "electron-test",
     scalaJSUseMainModuleInitializer := true,
     scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.CommonJSModule)),
+    jsEnv := new org.scalajs.jsenv.nodejs.ElectronJSEnv()
   )
 
 // lazy val site = project.in(file("site"))

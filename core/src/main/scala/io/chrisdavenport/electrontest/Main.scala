@@ -9,35 +9,27 @@ import io.chrisdavenport.electrontest.internal.jsdeps.electron.mod.app
 import io.chrisdavenport.electrontest.internal.jsdeps.electron
 
 import electron.mod.BrowserWindow
-
-// import fs2.internal.jsdeps.node.eventsMod
-// import cats.effect.unsafe.IORuntime.global
+import cats.effect.unsafe.IORuntime.global
 
 
-object Main  {
+object Main extends IOApp  {
 
-  def createWindow() = {
+  def createWindow() = IO.defer{
     val window = new BrowserWindow(
       electron.Electron.BrowserWindowConstructorOptions()
         .setMaxHeight(600)
         .setMaxWidth(800)
     )
-    // window.loadFile("index.html")
+    IO.fromPromise(IO(window.loadFile("index.html")))
   }
 
-  def main(args: Array[String]): Unit = {
-    app.on("ready", {_: Any => createWindow(); ()})
-    app.on("window-all-closed", {_: Any => app.quit()})
+  def run(args: List[String]): IO[ExitCode] = {
+    for {
+      _ <- IO(app.on("window-all-closed", {_: Any => IO(app.exit()).unsafeRunAndForget()(global)}))
+      _ <- IO.fromPromise(IO(app.whenReady()))
+      _ <- createWindow()
+    
+    } yield ExitCode.Success
   }
-
-  // def run(args: List[String]): IO[ExitCode] = {
-  //   for {
-  //     finished <- Deferred[IO, Unit]
-  //     // window <- IO(new BrowserWindow())
-  //     _ <- IO()
-  //     _ <- IO(App.on("window-all-closed", {_: Any => finished.complete(()).unsafeRunAndForget()(global)}))
-  //     _ <- finished.get
-  //   } yield ExitCode.Success
-  // }
 
 }

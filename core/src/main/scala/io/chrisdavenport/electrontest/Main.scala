@@ -20,15 +20,14 @@ object Main extends IOApp  {
         .setMaxHeight(600)
         .setMaxWidth(800)
     )
-    IO.fromPromise(IO(window.loadFile("index.html")))
+    IO.fromPromise(IO(window.loadFile("index.html"))).as(window)
   }
 
   def run(args: List[String]): IO[ExitCode] = {
     for {
       _ <- IO(app.on("window-all-closed", {_: Any => IO(app.exit()).unsafeRunAndForget()(global)}))
       _ <- IO.fromPromise(IO(app.whenReady()))
-      _ <- createWindow()
-    
+      window <- createWindow()
     } yield ExitCode.Success
   }
 

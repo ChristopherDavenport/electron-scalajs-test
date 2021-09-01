@@ -18,8 +18,8 @@ object Main extends IOApp  {
   def createWindow() = IO.defer{
     val window = new BrowserWindow(
       electron.Electron.BrowserWindowConstructorOptions()
-        .setMaxHeight(800)
-        .setMaxWidth(1000)
+        .setWidth(1000)
+        .setHeight(800)
         .setWebPreferences(
           electron.Electron.WebPreferences() // "__dirname"
             .setPreload(node.pathMod.join(node.global.dirname, "preload.js"))

@@ -1,14 +1,10 @@
-# electron-test - Electron Test App [![Build Status](https://travis-ci.com/ChristopherDavenport/electron-test.svg?branch=master)](https://travis-ci.com/ChristopherDavenport/electron-test) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.chrisdavenport/electron-test_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.chrisdavenport/electron-test_2.12) ![Code of Consuct](https://img.shields.io/badge/Code%20of%20Conduct-Scala-blue.svg)
+# electron-test - Electron Test App 
 
-## [Head on over to the microsite](https://ChristopherDavenport.github.io/electron-test)
+## Working With Electron
 
-## Quick Start
+Electron works much like a chrome browser. We present a minimal picture of how one does this
 
-To use electron-test in an existing SBT project with Scala 2.11 or a later version, add the following dependencies to your
-`build.sbt` depending on your needs:
-
-```scala
-libraryDependencies ++= Seq(
-  "io.chrisdavenport" %% "electron-test" % "<version>"
-)
-```
+- main.js: This is the central Electron process whose job it is to manage all things related to windows and upper level constructs.
+- renderer.js: This is the process responsible for the maintenance of the page. It works like any other dom based script and only has access to the dom environment like in a browser window, it may communicate with the electron process via event handlers and via ipcMain which is a pipeline between the main and renderer processes. This is loaded like a normal script from a web resource.
+- preload.js: This operates to allow communication with both the dom and node environments. May not be necessary for many use cases. 
+- output/index.html: This is the base document, it works and loads like a traditional webpage.

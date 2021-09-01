@@ -18,14 +18,16 @@ object Main extends IOApp  {
   def createWindow() = IO.defer{
     val window = new BrowserWindow(
       electron.Electron.BrowserWindowConstructorOptions()
-        .setMaxHeight(600)
-        .setMaxWidth(800)
+        .setMaxHeight(800)
+        .setMaxWidth(1000)
         .setWebPreferences(
-          electron.Electron.WebPreferences()
-            .setPreload(node.pathMod.join("__dirname", "preload.js"))
+          electron.Electron.WebPreferences() // "__dirname"
+            .setPreload(node.pathMod.join(node.global.dirname, "preload.js"))
         )
     )
-    IO.fromPromise(IO(window.loadFile("index.html"))).as(window)
+    IO.fromPromise(IO(window.loadFile("index.html")))
+      .flatTap(_ => IO(window.webContents.openDevTools()))
+      .as(window)
   }
 
   def run(args: List[String]): IO[ExitCode] = {
@@ -33,6 +35,7 @@ object Main extends IOApp  {
       _ <- IO(app.on("window-all-closed", {_: Any => IO(app.exit()).unsafeRunAndForget()(global)}))
       _ <- IO.fromPromise(IO(app.whenReady()))
       window <- createWindow()
+      _ <- IO(println("Test Main"))
     } yield ExitCode.Success
   }
 

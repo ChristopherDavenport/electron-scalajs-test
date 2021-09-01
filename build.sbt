@@ -24,10 +24,10 @@ val munitCatsEffectV = "1.0.5"
 lazy val `electron-test` = project.in(file("."))
   .disablePlugins(MimaPlugin)
   .enablePlugins(NoPublishPlugin)
-  .aggregate(core)
+  .aggregate(node, main, render, preload)
 
 lazy val node = project
-  .in(file("node"))
+  .in(file("electron/node"))
   .enablePlugins(ScalaJSPlugin)
   .enablePlugins(ScalablyTypedConverterGenSourcePlugin)
   .settings(
@@ -47,29 +47,47 @@ lazy val node = project
 
 
 import org.scalajs.jsenv._
-lazy val core = project.in(file("core"))
-  .enablePlugins(ScalaJSPlugin)
-  .enablePlugins(ScalaJSBundlerPlugin)
+lazy val main = project.in(file("electron/main"))
+  .enablePlugins(NpmPackagePlugin)
   .dependsOn(node)
   .settings(commonSettings)
   .settings(
     name := "electron-test",
     scalaJSUseMainModuleInitializer := true,
     scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.CommonJSModule)),
-    jsEnv := new org.scalajs.jsenv.nodejs.ElectronJSEnv()
+    jsEnv := new org.scalajs.jsenv.nodejs.ElectronJSEnv(),
+    npmPackageOutputDirectory := file("output")
   )
 
-// lazy val site = project.in(file("site"))
-//   .disablePlugins(MimaPlugin)
-//   .enablePlugins(DavenverseMicrositePlugin)
-//   .settings(commonSettings)
-//   .dependsOn(core)
-//   .settings{
-//     import microsites._
-//     Seq(
-//       micrositeDescription := "Electron Test App",
-//     )
-//   }
+lazy val preload = project.in(file("electron/preload"))
+  .enablePlugins(NpmPackagePlugin)
+  .dependsOn(node)
+  .settings(commonSettings)
+  .settings(
+    name := "electron-test-preload",
+    scalaJSUseMainModuleInitializer := true,
+    scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.CommonJSModule)),
+    npmPackageOutputDirectory := file("output"),
+    npmPackageOutputFilename := "preload.js",
+    libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "1.1.0"
+  )
+
+
+lazy val render = project.in(file("electron/renderer"))
+  .enablePlugins(NpmPackagePlugin)
+  .settings(commonSettings)
+  .settings(
+    name := "electron-test-render",
+    scalaJSUseMainModuleInitializer := true,
+    scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.CommonJSModule)),
+    jsEnv := new org.scalajs.jsenv.nodejs.ElectronJSEnv(),
+    npmPackageOutputDirectory := file("output"),
+    npmPackageOutputFilename := "renderer.js",
+    libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "1.1.0"
+  )
+
+
+addCommandAlias("electronOutput", ";render/npmPackageOutputJS ; preload/npmPackageOutputJS ; main/npmPackage")
 
 // General Settings
 lazy val commonSettings = Seq(
@@ -81,14 +99,14 @@ lazy val commonSettings = Seq(
     "co.fs2"                      %%% "fs2-core"                   % fs2V,
     "co.fs2"                      %%% "fs2-io"                     % fs2V,
 
-    "org.http4s"                  %%% "http4s-dsl"                 % http4sV,
-    "org.http4s"                  %%% "http4s-ember-server"        % http4sV,
-    "org.http4s"                  %%% "http4s-ember-client"        % http4sV,
-    "org.http4s"                  %%% "http4s-circe"               % http4sV,
+    // "org.http4s"                  %%% "http4s-dsl"                 % http4sV,
+    // "org.http4s"                  %%% "http4s-ember-server"        % http4sV,
+    // "org.http4s"                  %%% "http4s-ember-client"        % http4sV,
+    // "org.http4s"                  %%% "http4s-circe"               % http4sV,
 
-    "io.circe"                    %%% "circe-core"                 % circeV,
-    "io.circe"                    %%% "circe-generic"              % circeV,
-    "io.circe"                    %%% "circe-parser"               % circeV,
+    // "io.circe"                    %%% "circe-core"                 % circeV,
+    // "io.circe"                    %%% "circe-generic"              % circeV,
+    // "io.circe"                    %%% "circe-parser"               % circeV,
 
     // "org.tpolecat"                %% "doobie-core"                % doobieV,
     // "org.tpolecat"                %% "doobie-h2"                  % doobieV,

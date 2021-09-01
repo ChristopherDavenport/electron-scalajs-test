@@ -11,3 +11,8 @@ tags
 metals.sbt
 .vscode
 .bsp
+output/*.js
+output/*.md
+output/package.json
+package-lock.json
+yarn.lock
